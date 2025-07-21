@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    tools:context=".ui.AppLockActivity">
+
+    <EditText
+        android:id="@+id/pinEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter PIN"
+        android:inputType="numberPassword"
+        android:maxLength="6"
+        android:gravity="center"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/pinErrorText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="gone"
+        android:text="PIN must be 6 digits"
+        android:textSize="14sp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/pinEditText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp" />
+
+    <ImageButton
+        android:id="@+id/biometricButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/ic_fingerprint"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Unlock with biometrics"
+        app:layout_constraintTop_toBottomOf="@id/unlockButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        app:tint="@color/black" />
+
+
+    <Button
+        android:id="@+id/unlockButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Unlock"
+        android:enabled="false"
+        app:layout_constraintTop_toBottomOf="@id/pinErrorText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

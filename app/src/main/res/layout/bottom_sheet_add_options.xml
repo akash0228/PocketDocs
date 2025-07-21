@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView android:id="@+id/optionCamera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="📷 Take Photo"
+        android:padding="12dp"/>
+
+    <TextView android:id="@+id/optionGallery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🖼️ Select from Gallery"
+        android:padding="12dp"/>
+
+    <TextView android:id="@+id/optionPdf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="📄 Upload PDF"
+        android:padding="12dp"/>
+</LinearLayout>
