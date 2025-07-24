@@ -20,6 +20,7 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.MenuProvider
@@ -51,6 +52,9 @@ class HomeFragment : Fragment() {
     private lateinit var pdfLauncher: ActivityResultLauncher<String>
     private lateinit var cameraImageUri: Uri
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -64,11 +68,20 @@ class HomeFragment : Fragment() {
 
         setupTabs()
         setupMenu()
+        setupToolBar()
         setupRecyclerView()
         setupAddButton()
         setupCameraLauncher()
         setupGalleyLauncher()
         setupPdfLauncher()
+    }
+
+    private fun setupToolBar() {
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.mainToolbar)
+        toolbar.setNavigationIcon(R.drawable.ic_options)
+        toolbar.setNavigationOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_settingsFragment)
+        }
     }
 
     private fun setupPdfLauncher() {

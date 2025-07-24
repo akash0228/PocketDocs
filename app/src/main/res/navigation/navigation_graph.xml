@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.akash.pocketdocs.ui.HomeFragment"
-        android:label="fragment_home"
+        android:label="PocketDocs"
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_homeFragment_to_settingsFragment"
@@ -21,7 +21,7 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.akash.pocketdocs.ui.SettingsFragment"
-        android:label="fragment_settings"
+        android:label="Settings"
         tools:layout="@layout/fragment_settings" >
         <action
             android:id="@+id/action_settingsFragment_to_homeFragment"
@@ -32,7 +32,7 @@
     <fragment
         android:id="@+id/documentDetailsFragment"
         android:name="com.akash.pocketdocs.ui.DocumentDetailsFragment"
-        android:label="fragment_document_details"
+        android:label="Details"
         tools:layout="@layout/fragment_document_details" >
         <action
             android:id="@+id/action_documentDetailsFragment_to_homeFragment"

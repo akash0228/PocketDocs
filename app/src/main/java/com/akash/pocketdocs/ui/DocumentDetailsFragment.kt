@@ -1,7 +1,9 @@
 package com.akash.pocketdocs.ui
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -17,6 +19,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.akash.pocketdocs.R
 import com.akash.pocketdocs.data.Document
 import com.akash.pocketdocs.databinding.FragmentDocumentDetailsBinding
@@ -58,10 +61,60 @@ class DocumentDetailsFragment : Fragment() {
 
         setupDetails()
         setupEditButton()
+        setupShareButton()
+        setupDeleteButton()
         setupOnDocumentClick()
         setupPdfLauncher()
         setupGalleyLauncher()
         setupCameraLauncher()
+    }
+
+    private fun setupDeleteButton() {
+        val alertDialog = AlertDialog.Builder(requireContext())
+
+        alertDialog
+            .setTitle("Alert!!")
+            .setMessage("Document will be deleted permanently.\n Do you want to continue?")
+            .setCancelable(true)
+            .setPositiveButton("Continue"){ _, _->
+                //TODO show toast
+               findNavController().navigate(R.id.action_documentDetailsFragment_to_homeFragment)
+            }
+            .setNeutralButton("Cancel"){ dialog, _ ->
+                dialog.cancel()
+            }
+            .create()
+
+        binding.buttonDelete.setOnClickListener {
+            alertDialog.show()
+        }
+    }
+
+    private fun setupShareButton() {
+        binding.buttonShare.setOnClickListener {
+            val file = File(document.filePath)
+            val uri = FileProvider.getUriForFile(
+                requireContext(),
+                "${requireContext().packageName}.fileprovider",
+                file
+            )
+
+            val mimeType = if (file.extension.equals("pdf", true)) {
+                "application/pdf"
+            } else {
+                "image/*"
+            }
+
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = mimeType
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            requireContext().startActivity(
+                Intent.createChooser(shareIntent, "Share Document")
+            )
+        }
     }
 
     private fun setupPdfLauncher() {

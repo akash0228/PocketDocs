@@ -4,8 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.akash.pocketdocs.R
 import com.akash.pocketdocs.databinding.FragmentSettingsBinding
 
@@ -15,16 +16,21 @@ class SettingsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_settings, container, false)
+        binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolBarTitle()
+        setupToolBar()
+
     }
 
-    private fun setToolBarTitle() {
-        (requireActivity() as AppCompatActivity).actionBar?.title = "Setting"
+    private fun setupToolBar() {
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.mainToolbar)
+        toolbar.setNavigationOnClickListener {
+            findNavController().navigate(R.id.action_settingsFragment_to_homeFragment)
+        }
     }
 
 }
