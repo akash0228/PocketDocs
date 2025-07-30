@@ -25,14 +25,17 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.akash.pocketdocs.R
 import com.akash.pocketdocs.data.Document
 import com.akash.pocketdocs.databinding.FragmentHomeBinding
+import com.akash.pocketdocs.viewmodel.DocumentViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.tabs.TabLayout
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -42,19 +45,13 @@ import java.util.Locale
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var adapter: DocumentAdapter
-    val sampleDocs = mutableListOf(
-        Document(name="Aadhar Card", category="ID", relation="Self", idNumber="XXXX", expiryDate=null, filePath="", addedDate=System.currentTimeMillis(), type = "pdf" ),
-        Document(name="PAN Card", category="ID", relation="Self", idNumber="YYYY", expiryDate=null, filePath="", addedDate=System.currentTimeMillis(), type = "pdf")
-    )
+    private val viewModel : DocumentViewModel by viewModels()
 
     private lateinit var cameraLauncher: ActivityResultLauncher<Uri>
     private lateinit var galleryLauncher: ActivityResultLauncher<Intent>
     private lateinit var pdfLauncher: ActivityResultLauncher<String>
     private lateinit var cameraImageUri: Uri
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -70,10 +67,17 @@ class HomeFragment : Fragment() {
         setupMenu()
         setupToolBar()
         setupRecyclerView()
+        observeFilteredDocuments()
         setupAddButton()
         setupCameraLauncher()
         setupGalleyLauncher()
         setupPdfLauncher()
+    }
+
+    private fun observeFilteredDocuments() {
+        viewModel.filteredDocuments.observe(viewLifecycleOwner) { documents ->
+            adapter.submitList(documents)
+        }
     }
 
     private fun setupToolBar() {
@@ -152,8 +156,7 @@ class HomeFragment : Fragment() {
             val type = dialogView.findViewById<Spinner>(R.id.spinnerType).selectedItem.toString()
             val category = dialogView.findViewById<Spinner>(R.id.spinnerCategory).selectedItem.toString()
 
-            sampleDocs.add(Document(name = title, category = category, relation = relation, expiryDate = expiryDateMillis, addedDate = System.currentTimeMillis(), filePath = path, type = type, idNumber = idNumber))
-            setupRecyclerView()
+            viewModel.addDocument(Document(name = title, category = category, relation = relation, expiryDate = expiryDateMillis, addedDate = System.currentTimeMillis(), filePath = path, type = type, idNumber = idNumber))
 
             bottomSheetDialog.dismiss()
         }
@@ -212,21 +215,21 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = DocumentAdapter(sampleDocs, object: DocumentAdapter.DocumentAdapterListener{
+        adapter = DocumentAdapter(object: DocumentAdapter.DocumentAdapterListener{
             override fun onDeleteClicked(position: Int) {
                 deleteDocumentAtPosition(position)
             }
 
-            override fun onEditClicked(position: Int) {
-                editDocumentAtPosition(position)
+            override fun onEditClicked(document: Document) {
+                editDocument(document)
             }
 
-            override fun onShareClicked(position: Int) {
-                shareDocumentAtPosition(position)
+            override fun onShareClicked(document: Document) {
+                shareDocumentAtPosition(document)
             }
 
-            override fun onItemClicked(position: Int) {
-                showDetailsOfDocumentAtPosition(position)
+            override fun onItemClicked(document: Document) {
+                showDetailsOfDocumentAtPosition(document)
             }
 
         })
@@ -235,11 +238,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun deleteDocumentAtPosition(position : Int) {
-        sampleDocs.removeAt(position)
-        setupRecyclerView()
+        viewModel.deleteDocument(position)
     }
 
-    private fun editDocumentAtPosition(position : Int) {
+    private fun editDocument(currentDcoument : Document) {
         val dialogView = layoutInflater.inflate(R.layout.bottom_sheet_add_edit_document, null)
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         bottomSheetDialog.setContentView(dialogView)
@@ -255,14 +257,15 @@ class HomeFragment : Fragment() {
         val categories = listOf("Photos", "Bills", "ID Cards", "Certificates", "Results")
         val types = listOf("Image", "Pdf")
 
-        editTitle.setText(sampleDocs[position].name)
-        editIdNumber.setText(sampleDocs[position].idNumber)
-        editRelation.setText(sampleDocs[position].relation)
-        spinnerType.setSelection(types.indexOf(sampleDocs[position].type))
-        spinnerCategory.setSelection(categories.indexOf(sampleDocs[position].category))
+
+        editTitle.setText(currentDcoument.name)
+        editIdNumber.setText(currentDcoument.idNumber)
+        editRelation.setText(currentDcoument.relation)
+        spinnerType.setSelection(types.indexOf(currentDcoument.type))
+        spinnerCategory.setSelection(categories.indexOf(currentDcoument.category))
 
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val formattedDate = sdf.format(Date(sampleDocs[position].expiryDate!!))
+        val formattedDate = sdf.format(Date(currentDcoument.expiryDate!!))
         editExpiryDate.setText(formattedDate)
 
         var expiryDateMillis: Long? = null
@@ -294,18 +297,16 @@ class HomeFragment : Fragment() {
             val type = spinnerType.selectedItem.toString()
             val category = spinnerCategory.selectedItem.toString()
 
-            val newDocument = Document(name = title, category = category, relation = relation, expiryDate = expiryDateMillis, addedDate = System.currentTimeMillis(), filePath = sampleDocs[position].filePath, type = type, idNumber = idNumber)
-            sampleDocs.removeAt(position)
-            sampleDocs.add(position, newDocument)
-            setupRecyclerView()
+            val newDocument = Document(name = title, category = category, relation = relation, expiryDate = expiryDateMillis, addedDate = System.currentTimeMillis(), filePath = currentDcoument.filePath, type = type, idNumber = idNumber)
+            viewModel.updateDocument(currentDcoument.id, newDocument)
 
             bottomSheetDialog.dismiss()
         }
         bottomSheetDialog.show()
     }
 
-    private fun shareDocumentAtPosition(position : Int) {
-        val file = File(sampleDocs[position].filePath)
+    private fun shareDocumentAtPosition(document: Document) {
+        val file = File(document.filePath)
         val uri = FileProvider.getUriForFile(
             requireContext(),
             "${requireContext().packageName}.fileprovider",
@@ -329,9 +330,9 @@ class HomeFragment : Fragment() {
         )
     }
 
-    private fun showDetailsOfDocumentAtPosition(position: Int){
+    private fun showDetailsOfDocumentAtPosition(document: Document){
         val bundle = Bundle().apply {
-            putParcelable("document", sampleDocs[position])
+            putParcelable("document", document)
         }
         findNavController().navigate(R.id.action_homeFragment_to_documentDetailsFragment, bundle)
     }
@@ -352,6 +353,7 @@ class HomeFragment : Fragment() {
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
+                        viewModel.setSearchQuery(newText?:"")
                         return true
                     }
                 })
@@ -370,6 +372,19 @@ class HomeFragment : Fragment() {
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Certificates"))
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Photos"))
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Results"))
+
+        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                viewModel.setSelectedCategory(tab?.text.toString())
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+
+        })
     }
 
     private fun copyUriToInternalStorage(context: Context, uri: Uri): String? {

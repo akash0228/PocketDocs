@@ -16,7 +16,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class DocumentAdapter(private val documentList: List<Document>, val listener: DocumentAdapterListener): RecyclerView.Adapter<DocumentAdapter.DocumentViewHolder>() {
+class DocumentAdapter(val listener: DocumentAdapterListener): RecyclerView.Adapter<DocumentAdapter.DocumentViewHolder>() {
+
+    private val documentList: MutableList<Document> = mutableListOf()
 
     class DocumentViewHolder(val binding: ItemDocumentBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -63,7 +65,7 @@ class DocumentAdapter(private val documentList: List<Document>, val listener: Do
             popup.setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.action_edit -> {
-                        listener.onEditClicked(position)
+                        listener.onEditClicked(document)
                         true
                     }
                     R.id.action_delete -> {
@@ -71,7 +73,7 @@ class DocumentAdapter(private val documentList: List<Document>, val listener: Do
                         true
                     }
                     R.id.action_share -> {
-                        listener.onShareClicked(position)
+                        listener.onShareClicked(document)
                         true
                     }
                     else -> false
@@ -81,7 +83,7 @@ class DocumentAdapter(private val documentList: List<Document>, val listener: Do
         }
 
         holder.binding.root.setOnClickListener {
-            listener.onItemClicked(position)
+            listener.onItemClicked(document)
         }
     }
 
@@ -108,10 +110,16 @@ class DocumentAdapter(private val documentList: List<Document>, val listener: Do
         return bitmap
     }
 
+    fun submitList(newList : List<Document>){
+        documentList.clear()
+        documentList.addAll(newList)
+        notifyDataSetChanged()
+    }
+
     interface DocumentAdapterListener {
         fun onDeleteClicked(position: Int)
-        fun onEditClicked(position: Int)
-        fun onShareClicked(position: Int)
-        fun onItemClicked(position: Int)
+        fun onEditClicked(document: Document)
+        fun onShareClicked(document: Document)
+        fun onItemClicked(document: Document)
     }
 }

@@ -28,6 +28,9 @@
             app:destination="@id/homeFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_settingsFragment_to_changePinFragment"
+            app:destination="@id/changePinFragment" />
     </fragment>
     <fragment
         android:id="@+id/documentDetailsFragment"
@@ -38,6 +41,17 @@
             android:id="@+id/action_documentDetailsFragment_to_homeFragment"
             app:destination="@id/homeFragment"
             app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/changePinFragment"
+        android:name="com.akash.pocketdocs.ui.ChangePinFragment"
+        android:label="Change Pin"
+        tools:layout="@layout/fragment_change_pin" >
+        <action
+            android:id="@+id/action_changePinFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:popUpTo="@id/settingsFragment"
             app:popUpToInclusive="true" />
     </fragment>
 
